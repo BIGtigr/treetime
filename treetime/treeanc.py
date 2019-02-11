@@ -874,7 +874,7 @@ class TreeAnc(object):
         # if ancestral sequences are not in place, reconstruct them
         if marginal  and (not hasattr(self.tree.root,'marginal_profile')):
             self._ml_anc_marginal(final=True, **kwargs)
-        elif (not hasattr(self.tree.root,'cseq')):
+        elif (not hasattr(self.tree.root,'cseq')) or (self.tree.root.cseq is None):
             self._ml_anc_joint(final=True, **kwargs)
 
         if (self.tree is None) or (self.aln is None):
@@ -1820,7 +1820,7 @@ class TreeAnc(object):
 
 
     def optimize_tree_marginal(self, max_iter=10, infer_gtr=False, damping=0.75,
-                               LHtol=0.1, site_specific_gtr=False):
+                               LHtol=0.1, site_specific_gtr=False, pc=1.0):
         self.infer_ancestral_sequences(marginal=True)
         oldLH = self.sequence_LH()
         self.logger("TreeAnc.optimize_tree_marginal: initial, LH=%1.2f, total branch_length %1.4f"%
@@ -1840,7 +1840,7 @@ class TreeAnc(object):
             dbl = np.mean(np.abs(tmp[:,0]-tmp[:,1])/(tmp[:,0]+tmp[:,1]))
 
             if infer_gtr:
-                self.infer_gtr(site_specific=site_specific_gtr, marginal=True, normalized_rate=True)
+                self.infer_gtr(site_specific=site_specific_gtr, marginal=True, normalized_rate=True, pc=pc)
 
             self.infer_ancestral_sequences(marginal=True)
 
